@@ -150,3 +150,32 @@
   font-size:13px;
 }
 .kv b{color:var(--muted); font-weight:700}
+/* modal */
+.modal-backdrop{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.55);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+}
+.modal{
+  width:min(680px, 92vw);
+  border:1px solid var(--border);
+  background:rgba(10,14,22,.96);
+  border-radius:18px;
+  padding:16px;
+  box-shadow:0 16px 50px rgba(0,0,0,.45);
+}
+
+.btn-sm{ padding:8px 10px; font-size:12px; }
+.hint{
+  border:1px dashed var(--border);
+  background:rgba(255,255,255,.04);
+  border-radius:14px;
+  padding:12px;
+  font-size:13px;
+  color:var(--muted);
+}
+
