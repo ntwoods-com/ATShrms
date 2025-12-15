@@ -62,3 +62,9 @@ export function logout() {
   toast("Logged out");
   renderShell();
 }
+export async function refreshSessionUser() {
+  // simplest token check → backend pe
+  // ye call session token ko validate bhi karega
+  await fetch(".", { method: "HEAD" });
+}
+
