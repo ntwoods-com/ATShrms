@@ -2,6 +2,7 @@ import { state } from "./state.js";
 import { renderRequirementsPage } from "./modules/requirements.js";
 import { renderJobPostingPage } from "./modules/jobpostings.js";
 import { renderCandidatesPage } from "./modules/candidates.js";
+import { renderCallsPage } from "./modules/calls.js";
 
 export function buildNav() {
   const nav = document.getElementById("nav");
@@ -12,6 +13,7 @@ export function buildNav() {
     { id: "requirements", label: "Requirements", roles: ["ADMIN","HR","EA"] },
     { id: "job-postings", label: "Job Posting", roles: ["ADMIN","HR"] },
     { id: "candidates", label: "Candidates", roles: ["ADMIN","HR"] },
+    { id: "calls", label: "On-Call Screening", roles: ["ADMIN","HR"] },
     { id: "admin", label: "Admin", roles: ["ADMIN"] }
   ];
 
@@ -46,6 +48,7 @@ function routeFromHash() {
   if (route === "requirements") return renderRequirementsPage({ headerEl: header, rootEl: body });
   if (route === "job-postings") return renderJobPostingPage({ headerEl: header, rootEl: body, params });
   if (route === "candidates") return renderCandidatesPage({ headerEl: header, rootEl: body, params });
+  if (route === "calls") return renderCallsPage({ headerEl: header, rootEl: body, params });
 
   header.textContent = route.toUpperCase();
   body.innerHTML = `<div class="card card-wide">Module <b>${route}</b> pending (NEXT parts).</div>`;
