@@ -1,25 +1,17 @@
-const API_ENDPOINT = "https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec";
+import { CONFIG } from "./config.js";
+import { getSessionToken } from "./auth.js";
 
-export const callApi = async (action, data = {}, token) => {
-  const payload = {
-    action,
-    token,
-    data,
-  };
+export async function api(action, data = {}) {
+  const token = getSessionToken();
+  const payload = { action, token, data };
 
-  const response = await fetch(API_ENDPOINT, {
+  const res = await fetch(CONFIG.API_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
 
-  if (!response.ok) {
-    throw new Error(`API error: ${response.status}`);
-  }
-
-  const json = await response.json();
-  if (json.error) {
-    throw new Error(json.error);
-  }
-  return json;
-};
+  const json = await res.json();
+  if (!json.ok) throw new Error(json.error?.message || "API Error");
+  return json.data;
+}
