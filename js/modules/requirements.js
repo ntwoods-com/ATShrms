@@ -1,5 +1,6 @@
 import { apiCall } from "../api.js";
 import { state } from "../state.js";
+import { routeTo } from "../ui-router.js";
 
 export async function renderRequirementsPage({ headerEl, rootEl }) {
   headerEl.textContent = "REQUIREMENTS";
@@ -24,7 +25,6 @@ export async function renderRequirementsPage({ headerEl, rootEl }) {
     const leftPane = rootEl.querySelector("#leftPane");
     const rightPane = rootEl.querySelector("#rightPane");
 
-    // Left: role-based panel
     if (state.user.role === "EA" || state.user.role === "ADMIN") {
       renderRaiseForm(leftPane, templates, async (payload) => {
         await apiCall("RAISE_REQUIREMENT", payload);
@@ -39,7 +39,6 @@ export async function renderRequirementsPage({ headerEl, rootEl }) {
       `;
     }
 
-    // Right: list
     renderList(rightPane, requirements, templates, async (action, reqId, data) => {
       if (action === "APPROVE") {
         await apiCall("APPROVE_REQUIREMENT", { requirementId: reqId, remark: data.remark || "" });
@@ -47,6 +46,9 @@ export async function renderRequirementsPage({ headerEl, rootEl }) {
         await apiCall("SEND_BACK_REQUIREMENT", { requirementId: reqId, remark: data.remark || "" });
       } else if (action === "RESUBMIT") {
         await apiCall("RESUBMIT_REQUIREMENT", { requirementId: reqId, payload: data.payload });
+      } else if (action === "OPEN_JOB_POSTING") {
+        routeTo("job-postings", { req: reqId });
+        return;
       }
       await rerender();
     });
@@ -117,11 +119,8 @@ function renderRaiseForm(container, templates, onSubmit) {
       msg.textContent = "Submitting...";
       if (!currentTemplate) throw new Error("Please select template role");
 
-      // validate required
       const missing = validateTemplate(currentTemplate, model);
-      if (missing.length) {
-        throw new Error("Missing required: " + missing.join(", "));
-      }
+      if (missing.length) throw new Error("Missing required: " + missing.join(", "));
 
       await onSubmit({
         templateRole: tplRoleEl.value,
@@ -155,19 +154,21 @@ function renderList(container, requirements, templates, onAction) {
   `;
 
   const listEl = container.querySelector("#list");
-
   if (!requirements.length) {
     listEl.innerHTML = `<div class="muted">No requirements found.</div>`;
     return;
   }
 
-  const rows = requirements.map(req => {
-    const pillClass = req.status === "PENDING_HR_REVIEW" ? "warn"
-      : req.status === "NEED_CLARIFICATION" ? "bad"
-      : "ok";
+  listEl.innerHTML = requirements.map(req => {
+    const pillClass =
+      req.status === "PENDING_HR_REVIEW" ? "warn" :
+      req.status === "NEED_CLARIFICATION" ? "bad" : "ok";
 
     const tpl = templates.find(t => t.role === req.templateRole);
     const title = (req.payload?.templateTitle || tpl?.template?.title || req.templateRole || "Requirement");
+
+    const jpInfo = req.jobPosting ? `JP: ${req.jobPosting.status} | Posted: ${req.jobPosting.postedCount}` : `JP: Not created`;
+    const unlock = req.addCandidateUnlocked ? `Add Candidate: UNLOCKED` : `Add Candidate: LOCKED`;
 
     return `
       <div class="card card-wide" style="margin-bottom:12px">
@@ -187,64 +188,57 @@ function renderList(container, requirements, templates, onAction) {
           <b>Urgency</b><div>${escapeHtml(req.payload?.urgency ?? "")}</div>
         </div>
 
+        <div class="hr"></div>
+        <div class="row">
+          <span class="pill">${escapeHtml(jpInfo)}</span>
+          <span class="pill ${req.addCandidateUnlocked ? "ok" : "bad"}">${escapeHtml(unlock)}</span>
+
+          ${(req.ui?.canOpenJobPosting) ? `<button class="btn right" data-act="openjp" data-id="${escapeAttr(req.id)}">Open Job Posting</button>` : ""}
+        </div>
+
         ${req.payload?.hrRemark ? `
           <div class="hr"></div>
           <div class="pill bad">HR Remark: ${escapeHtml(req.payload.hrRemark)}</div>
         ` : ""}
 
         <div class="hr"></div>
-
         <div id="actions_${escapeAttr(req.id)}"></div>
       </div>
     `;
   }).join("");
 
-  listEl.innerHTML = rows;
-
-  // bind action UI
+  // bind actions
   requirements.forEach(req => {
     const slot = container.querySelector(`#actions_${cssId(req.id)}`);
     slot.innerHTML = buildActionBlock(req);
 
-    // approve
+    const btnOpen = container.querySelector(`[data-act="openjp"][data-id="${cssId(req.id)}"]`);
+    if (btnOpen) btnOpen.onclick = async () => onAction("OPEN_JOB_POSTING", req.id, {});
+
     const btnAppr = slot.querySelector(`[data-act="approve"]`);
-    if (btnAppr) {
-      btnAppr.onclick = async () => {
-        const remark = slot.querySelector(`[data-in="remark"]`)?.value || "";
-        await onAction("APPROVE", req.id, { remark });
-      };
-    }
+    if (btnAppr) btnAppr.onclick = async () => {
+      const remark = slot.querySelector(`[data-in="remark"]`)?.value || "";
+      await onAction("APPROVE", req.id, { remark });
+    };
 
-    // send back
     const btnBack = slot.querySelector(`[data-act="sendback"]`);
-    if (btnBack) {
-      btnBack.onclick = async () => {
-        const remark = (slot.querySelector(`[data-in="remark"]`)?.value || "").trim();
-        if (!remark) {
-          alert("Remark mandatory for Send Back");
-          return;
-        }
-        await onAction("SEND_BACK", req.id, { remark });
-      };
-    }
+    if (btnBack) btnBack.onclick = async () => {
+      const remark = (slot.querySelector(`[data-in="remark"]`)?.value || "").trim();
+      if (!remark) { alert("Remark mandatory for Send Back"); return; }
+      await onAction("SEND_BACK", req.id, { remark });
+    };
 
-    // resubmit
     const btnRes = slot.querySelector(`[data-act="resubmit"]`);
-    if (btnRes) {
-      btnRes.onclick = async () => {
-        const payload = req.payload || {};
-        // allow EA to edit payload inline (simple edit form)
-        const edited = collectInlineEdit(slot, req);
-        await onAction("RESUBMIT", req.id, { payload: edited });
-      };
-    }
+    if (btnRes) btnRes.onclick = async () => {
+      const edited = collectInlineEdit(slot, req);
+      await onAction("RESUBMIT", req.id, { payload: edited });
+    };
   });
 }
 
 function buildActionBlock(req) {
   const ui = req.ui || {};
 
-  // HR actions
   if (ui.canApprove || ui.canSendBack) {
     return `
       <div class="row">
@@ -255,12 +249,10 @@ function buildActionBlock(req) {
     `;
   }
 
-  // EA resubmit actions
   if (ui.canResubmit) {
     return `
       <div class="grid">
         <div class="pill bad">Need Clarification → Edit & Resubmit</div>
-
         <div class="grid grid-2">
           <div class="form-row">
             <div class="label">Positions</div>
@@ -271,7 +263,6 @@ function buildActionBlock(req) {
             <input class="input" data-edit="location" value="${escapeAttr(req.payload?.location ?? "")}" />
           </div>
         </div>
-
         <div class="grid grid-2">
           <div class="form-row">
             <div class="label">Experience</div>
@@ -282,12 +273,10 @@ function buildActionBlock(req) {
             <input class="input" data-edit="urgency" value="${escapeAttr(req.payload?.urgency ?? "")}" />
           </div>
         </div>
-
         <div class="form-row">
           <div class="label">Notes</div>
           <textarea class="textarea" data-edit="notes">${escapeHtml(req.payload?.notes ?? "")}</textarea>
         </div>
-
         <div class="row">
           <button class="btn" data-act="resubmit">Resubmit to HR</button>
         </div>
@@ -295,22 +284,18 @@ function buildActionBlock(req) {
     `;
   }
 
-  // no actions
   return `<div class="muted small">No actions available.</div>`;
 }
 
 function collectInlineEdit(slot, req) {
   const payload = { ...(req.payload || {}) };
-
   slot.querySelectorAll("[data-edit]").forEach(el => {
     const key = el.getAttribute("data-edit");
     let val = el.value;
     if (key === "positions") {
       const n = Number(val);
       payload[key] = Number.isFinite(n) ? n : val;
-    } else {
-      payload[key] = val;
-    }
+    } else payload[key] = val;
   });
 
   payload.resubmittedByName = state.user.name;
@@ -326,7 +311,6 @@ function buildDefaults(tpl) {
     if (typeof f.default !== "undefined") model[f.key] = f.default;
     else model[f.key] = (f.type === "number") ? 0 : "";
   });
-  // include metadata fields
   model.templateTitle = tpl?.template?.title || "";
   return model;
 }
@@ -347,21 +331,14 @@ function renderDynamicFields(root, tpl, model) {
     root.innerHTML = `<div class="muted">Select template to load fields.</div>`;
     return;
   }
-
   const fields = tpl.template?.fields || [];
-  const html = fields.map(f => renderField(f, model[f.key])).join("");
-  root.innerHTML = html;
+  root.innerHTML = fields.map(f => renderField(f, model[f.key])).join("");
 
-  // bind
   fields.forEach(f => {
     const el = root.querySelector(`[data-key="${cssId(f.key)}"]`);
     if (!el) return;
-    el.oninput = () => {
-      model[f.key] = (f.type === "number") ? Number(el.value) : el.value;
-    };
-    el.onchange = () => {
-      model[f.key] = (f.type === "number") ? Number(el.value) : el.value;
-    };
+    el.oninput = () => model[f.key] = (f.type === "number") ? Number(el.value) : el.value;
+    el.onchange = () => model[f.key] = (f.type === "number") ? Number(el.value) : el.value;
   });
 }
 
@@ -400,7 +377,6 @@ function renderField(f, value) {
   `;
 }
 
-/** -------- helpers -------- */
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;" }[m]))}
 function escapeAttr(s){return escapeHtml(s)}
 function cssId(s){return String(s).replace(/[^a-zA-Z0-9_-]/g,"_")}
