@@ -1,33 +1,41 @@
 import { CONFIG } from "./config.js";
+import { api } from "./api.js";
+import { setSession, clearSession, State } from "./state.js";
+import { toast, renderShell } from "./ui.js";
 
-const LS_KEY = "HRMS_SESSION";
+export function initGoogleLogin() {
+  // render google button
+  window.google?.accounts?.id?.initialize({
+    client_id: CONFIG.GOOGLE_CLIENT_ID,
+    callback: async (resp) => {
+      try {
+        const idToken = resp.credential;
+        const data = await api("LOGIN_EXCHANGE", { idToken }, { public: true });
+        setSession({ user: data.user, sessionToken: data.sessionToken });
+        toast(`Logged in: ${data.user.name} (${data.user.role})`);
+        renderShell();
+      } catch (e) {
+        clearSession();
+        toast("Login failed: " + e.message, true);
+      }
+    }
+  });
 
-export function setSession(session) {
-  localStorage.setItem(LS_KEY, JSON.stringify(session));
+  window.google?.accounts?.id?.renderButton(
+    document.getElementById("gbtn"),
+    { theme: "outline", size: "large", text: "signin_with" }
+  );
 }
 
-export function getSession() {
-  try { return JSON.parse(localStorage.getItem(LS_KEY) || "null"); } catch { return null; }
-}
-
-export function getSessionToken() {
-  return getSession()?.sessionToken || "";
+export async function refreshSessionUser() {
+  // easiest: call GET_DASHBOARD (token verifies)
+  const dash = await api("GET_DASHBOARD", {});
+  // backend returns user summary; keep existing user name/role from State unless you want to override
+  return dash;
 }
 
 export function logout() {
-  localStorage.removeItem(LS_KEY);
-  location.href = "login.html";
-}
-
-// Google Identity callback (id_token)
-export async function exchangeIdToken(idToken) {
-  const res = await fetch(CONFIG.API_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ action: "LOGIN_EXCHANGE", token: "", data: { idToken } }),
-  });
-  const json = await res.json();
-  if (!json.ok) throw new Error(json.error?.message || "Login failed");
-  setSession({ ...json.data });
-  return json.data;
+  clearSession();
+  toast("Logged out");
+  renderShell();
 }
