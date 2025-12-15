@@ -1,14 +1,8 @@
-export const state = {
-  user: null,
-  sessionToken: null,
-  currentModule: "requirements",
-};
+import { getSession } from "./auth.js";
 
-export const setUser = (user, token) => {
-  state.user = user;
-  state.sessionToken = token;
-};
-
-export const setModule = (moduleId) => {
-  state.currentModule = moduleId;
+export const State = {
+  session: getSession(),
+  user() { return this.session?.user || null; },
+  permissions() { return this.session?.user?.permissions || []; },
+  has(p) { return this.permissions().includes(p); }
 };
