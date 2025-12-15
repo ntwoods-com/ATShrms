@@ -3,55 +3,66 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>ATS / HRMS</title>
+  <title>HRMS / ATS</title>
+  <link rel="stylesheet" href="./css/base.css" />
   <link rel="stylesheet" href="./css/app.css" />
+</head>
+<body>
+
+  <!-- Topbar -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">NTW</div>
+      <div>
+        <div class="title">HRMS / ATS</div>
+        <div class="subtitle">Requirement → Onboarding</div>
+      </div>
+    </div>
+
+    <div class="topbar-right">
+      <div id="userBadge" class="user-badge hidden"></div>
+      <button id="btnLogout" class="btn btn-ghost hidden">Logout</button>
+    </div>
+  </header>
+
+  <!-- Layout -->
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="nav-title">Navigation</div>
+      <nav id="nav"></nav>
+
+      <div class="sidebar-foot">
+        <div class="muted small" id="apiStatus">API: unknown</div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <!-- Login View -->
+      <section id="viewLogin" class="card">
+        <h2>Login</h2>
+        <p class="muted">Google OAuth se sign in karo. Backend role/permissions resolve karega.</p>
+
+        <div id="gBtn"></div>
+
+        <div class="hint">
+          Agar console me CORS/OPTIONS issue aaye, to tumne <b>application/json headers</b> bheje honge.
+          Hum is project me fetch me headers set nahi karte (text/plain pattern).
+        </div>
+
+        <div id="loginMsg" class="toast hidden"></div>
+      </section>
+
+      <!-- App View -->
+      <section id="viewApp" class="hidden">
+        <div id="pageHeader" class="page-header"></div>
+        <div id="pageBody"></div>
+      </section>
+    </main>
+  </div>
 
   <!-- Google Identity Services -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
-</head>
-<body>
-  <div class="app">
 
-    <!-- Top Bar -->
-    <header class="topbar">
-      <div class="brand">
-        <div class="logo"></div>
-        <div>
-          <div class="brand-title">ATS / HRMS</div>
-          <div class="brand-sub" id="brandSub">Not logged in</div>
-        </div>
-      </div>
-
-      <div class="top-actions">
-        <button class="btn ghost" id="btnRefresh">Refresh</button>
-        <button class="btn danger" id="btnLogout">Logout</button>
-      </div>
-    </header>
-
-    <!-- Body -->
-    <div class="layout">
-      <!-- Sidebar -->
-      <aside class="sidebar">
-        <div class="card" id="loginCard">
-          <div class="card-title">Login</div>
-          <div class="muted">Google se sign-in karo.</div>
-          <div id="gbtn" class="gbtn"></div>
-          <div class="muted small" id="loginMsg"></div>
-        </div>
-
-        <nav class="nav" id="nav"></nav>
-      </aside>
-
-      <!-- Main -->
-      <main class="main">
-        <div id="toast" class="toast hidden"></div>
-
-        <!-- Router outlet -->
-        <section id="view"></section>
-      </main>
-    </div>
-  </div>
-    <script type="module" src="./js/main.js"></script>
+  <script type="module" src="./js/app.js"></script>
 </body>
 </html>
-
