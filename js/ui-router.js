@@ -1,6 +1,7 @@
 import { state } from "./state.js";
 import { renderRequirementsPage } from "./modules/requirements.js";
 import { renderJobPostingPage } from "./modules/jobpostings.js";
+import { renderCandidatesPage } from "./modules/candidates.js";
 
 export function buildNav() {
   const nav = document.getElementById("nav");
@@ -10,7 +11,7 @@ export function buildNav() {
     { id: "home", label: "Home", roles: ["ADMIN","HR","EA","OWNER"] },
     { id: "requirements", label: "Requirements", roles: ["ADMIN","HR","EA"] },
     { id: "job-postings", label: "Job Posting", roles: ["ADMIN","HR"] },
-    { id: "candidates", label: "Candidates", roles: ["ADMIN","HR","OWNER"] },
+    { id: "candidates", label: "Candidates", roles: ["ADMIN","HR"] },
     { id: "admin", label: "Admin", roles: ["ADMIN"] }
   ];
 
@@ -42,14 +43,9 @@ function routeFromHash() {
   const header = document.getElementById("pageHeader");
   const body = document.getElementById("pageBody");
 
-  if (route === "requirements") {
-    renderRequirementsPage({ headerEl: header, rootEl: body });
-    return;
-  }
-  if (route === "job-postings") {
-    renderJobPostingPage({ headerEl: header, rootEl: body, params });
-    return;
-  }
+  if (route === "requirements") return renderRequirementsPage({ headerEl: header, rootEl: body });
+  if (route === "job-postings") return renderJobPostingPage({ headerEl: header, rootEl: body, params });
+  if (route === "candidates") return renderCandidatesPage({ headerEl: header, rootEl: body, params });
 
   header.textContent = route.toUpperCase();
   body.innerHTML = `<div class="card card-wide">Module <b>${route}</b> pending (NEXT parts).</div>`;
