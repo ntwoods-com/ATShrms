@@ -1,5 +1,6 @@
 import { state } from "./state.js";
 import { renderRequirementsPage } from "./modules/requirements.js";
+import { renderJobPostingPage } from "./modules/jobpostings.js";
 
 export function buildNav() {
   const nav = document.getElementById("nav");
@@ -8,6 +9,7 @@ export function buildNav() {
   const items = [
     { id: "home", label: "Home", roles: ["ADMIN","HR","EA","OWNER"] },
     { id: "requirements", label: "Requirements", roles: ["ADMIN","HR","EA"] },
+    { id: "job-postings", label: "Job Posting", roles: ["ADMIN","HR"] },
     { id: "candidates", label: "Candidates", roles: ["ADMIN","HR","OWNER"] },
     { id: "admin", label: "Admin", roles: ["ADMIN"] }
   ];
@@ -24,12 +26,17 @@ export function buildNav() {
     nav.appendChild(div);
   });
 
-  const hash = location.hash.replace("#/", "");
-  routeTo(hash || "home");
+  window.onhashchange = () => routeFromHash();
+  routeFromHash();
 }
 
-export function routeTo(route) {
-  location.hash = "#/" + route;
+export function routeTo(route, params = {}) {
+  const qs = new URLSearchParams(params).toString();
+  location.hash = "#/" + route + (qs ? "?" + qs : "");
+}
+
+function routeFromHash() {
+  const { route, params } = parseHash();
   setActive(route);
 
   const header = document.getElementById("pageHeader");
@@ -39,9 +46,21 @@ export function routeTo(route) {
     renderRequirementsPage({ headerEl: header, rootEl: body });
     return;
   }
+  if (route === "job-postings") {
+    renderJobPostingPage({ headerEl: header, rootEl: body, params });
+    return;
+  }
 
   header.textContent = route.toUpperCase();
   body.innerHTML = `<div class="card card-wide">Module <b>${route}</b> pending (NEXT parts).</div>`;
+}
+
+function parseHash() {
+  const raw = location.hash.replace("#/", "");
+  const [routePart, queryPart] = raw.split("?");
+  const route = routePart || "home";
+  const params = Object.fromEntries(new URLSearchParams(queryPart || ""));
+  return { route, params };
 }
 
 function setActive(route) {
