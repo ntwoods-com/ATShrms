@@ -1,21 +1,9 @@
 import { renderDashboard } from "./ui.js";
 import { renderRequirements } from "./modules/requirements.js";
-//import { renderCandidates } from "./modules/candidates.js";
-//import { renderCalls } from "./modules/calls.js";
-//import { renderInterviews } from "./modules/interviews.js";
-//import { renderTests } from "./modules/tests.js";
-//import { renderAdmin } from "./modules/admin.js";
-//import { renderOnboarding } from "./modules/onboarding.js";
 
 const routes = {
   "#/dashboard": renderDashboard,
   "#/requirements": renderRequirements,
-  "#/candidates": renderCandidates,
-  "#/calls": renderCalls,
-  "#/interviews": renderInterviews,
-  "#/tests": renderTests,
-  "#/onboarding": renderOnboarding,
-  "#/admin": renderAdmin
 };
 
 export function navigate(hash) {
