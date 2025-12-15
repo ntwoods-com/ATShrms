@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>HRMS Login</title>
+  <link rel="stylesheet" href="./css/base.css">
+  <script type="module">
+    import { CONFIG } from "./js/config.js";
+    import { exchangeIdToken } from "./js/auth.js";
+
+    window.onGoogleCredential = async (resp) => {
+      try {
+        await exchangeIdToken(resp.credential);
+        location.href = "index.html";
+      } catch (e) {
+        alert(e.message);
+      }
+    };
+
+    // load GSI
+    const s = document.createElement("script");
+    s.src = "https://accounts.google.com/gsi/client";
+    s.async = true; s.defer = true;
+    document.head.appendChild(s);
+
+    window.onload = () => {
+      window.google?.accounts?.id?.initialize({
+        client_id: CONFIG.GOOGLE_CLIENT_ID,
+        callback: window.onGoogleCredential
+      });
+      window.google?.accounts?.id?.renderButton(
+        document.getElementById("gbtn"),
+        { theme: "outline", size: "large" }
+      );
+    };
+  </script>
+</head>
+<body>
+  <div class="page-center">
+    <div class="card">
+      <h1>HRMS / ATS</h1>
+      <p>Login with Google</p>
+      <div id="gbtn"></div>
+    </div>
+  </div>
+</body>
+</html>
