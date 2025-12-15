@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HRMS / ATS Control Center</title>
+  <link rel="stylesheet" href="css/main.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand">HRMS / ATS</div>
+    <nav class="primary-nav">
+      <button data-view="dashboard">Dashboard</button>
+      <button data-view="requirements">Requirements</button>
+      <button data-view="candidates">Candidates</button>
+      <button data-view="calls">Call Screening</button>
+      <button data-view="interviews">Interviews</button>
+      <button data-view="tests">Tests</button>
+      <button data-view="admin">Admin</button>
+      <button data-view="onboarding">Onboarding</button>
+    </nav>
+    <div class="user-block">
+      <span id="user-name">Guest</span>
+      <button id="auth-btn">Sign in with Google</button>
+    </div>
+  </header>
+
+  <main id="app-view"></main>
+
+  <template id="dashboard-view">
+    <section class="panel">
+      <h1>State-Driven Workflow</h1>
+      <p>All actions are routed to the backend; UI responds to the returned state and permissions.</p>
+      <div class="grid">
+        <article class="card">
+          <h2>Requirement → Posting</h2>
+          <p>EA raises requirements, HR reviews, and job postings unlock automatically after approval.</p>
+        </article>
+        <article class="card">
+          <h2>Candidate Journey</h2>
+          <p>Shortlisting, call screening, owner review, interviews, tests, and onboarding in one timeline.</p>
+        </article>
+        <article class="card">
+          <h2>Audit & Rejection Logs</h2>
+          <p>Every transition is recorded for revertability and compliance.</p>
+        </article>
+      </div>
+    </section>
+  </template>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
