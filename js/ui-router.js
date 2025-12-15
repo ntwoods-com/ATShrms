@@ -5,6 +5,7 @@ import { renderCandidatesPage } from "./modules/candidates.js";
 import { renderCallsPage } from "./modules/calls.js";
 import { renderOwnerPage } from "./modules/owner.js";
 import { renderInterviewsPage } from "./modules/interviews.js";
+import { renderPreInterviewPage } from "./modules/preinterview.js";
 
 export function buildNav() {
   const nav = document.getElementById("nav");
@@ -18,6 +19,7 @@ export function buildNav() {
     { id: "calls", label: "On-Call Screening", roles: ["ADMIN","HR"] },
     { id: "owner", label: "Owner Decision", roles: ["ADMIN","OWNER"] },
     { id: "interviews", label: "Interviews", roles: ["ADMIN","HR"] },
+    { id: "pre-interview", label: "Pre-Interview", roles: ["ADMIN","HR"] },
     { id: "admin", label: "Admin", roles: ["ADMIN"] }
   ];
 
@@ -55,6 +57,7 @@ function routeFromHash() {
   if (route === "calls") return renderCallsPage({ headerEl: header, rootEl: body, params });
   if (route === "owner") return renderOwnerPage({ headerEl: header, rootEl: body, params });
   if (route === "interviews") return renderInterviewsPage({ headerEl: header, rootEl: body, params });
+  if (route === "pre-interview") return renderPreInterviewPage({ headerEl: header, rootEl: body, params });
 
   header.textContent = route.toUpperCase();
   body.innerHTML = `<div class="card card-wide">Module <b>${route}</b> pending (NEXT parts).</div>`;
