@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ATS / HRMS Control Center</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">ATS / HRMS</div>
+    <div class="user-info" id="user-info">
+      <span class="user-name">Guest</span>
+      <button class="btn" id="login-btn">Login with Google</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <nav class="sidebar" id="nav"></nav>
+    <section class="content" id="content"></section>
+  </main>
+
+  <template id="module-card">
+    <article class="card">
+      <header class="card__header">
+        <div>
+          <p class="card__eyebrow"></p>
+          <h3 class="card__title"></h3>
+        </div>
+        <div class="status-pill"></div>
+      </header>
+      <div class="card__body"></div>
+      <footer class="card__footer"></footer>
+    </article>
+  </template>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
