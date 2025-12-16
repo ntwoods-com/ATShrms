@@ -257,7 +257,7 @@ export async function renderTestBank(root) {
     await load();
     resetForm();
     toast("Saved ✅");
-  });
+  }
 
   resetForm();
   await load();
