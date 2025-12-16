@@ -31,7 +31,7 @@ export function buildNav() {
     { id: "owner", label: "Owner Decision", roles: ["ADMIN","OWNER"] },
     { id: "interviews", label: "Interviews", roles: ["ADMIN","HR"] },
     { id: "pre-interview", label: "Pre-Interview", roles: ["ADMIN","HR"] },
-    { id: "admin", label: "Admin", roles: ["ADMIN"] }
+    { id: "admin", label: "Admin", roles: ["ADMIN"] },
     { id: "final-interview", label: "Final Interview", roles: ["ADMIN","OWNER"] },
     { id: "onboarding", label: "Onboarding", roles: ["ADMIN","HR"] },
     { id: "employees", label: "Employees", roles: ["ADMIN","HR","OWNER"] },
