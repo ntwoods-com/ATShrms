@@ -127,14 +127,14 @@ function bindUploadPanel({ rootEl }) {
         msg.textContent = `Uploading ${i+1}/${files.length}: ${f.name}`;
         const base64 = await fileToBase64(f);
 
-        const res = await apiCall("ADD_CANDIDATE", {
+        const addRes = await apiCall("ADD_CANDIDATE", {
           requirementId: reqSel.value,
           fileName: f.name,
           fileMime: f.type || "application/pdf",
           fileBase64: base64
         });
 
-        const cand = res.candidate;
+        const cand = addRes.candidate;
 
         // relevant modal
         const decision = await askRelevantModal({
@@ -361,12 +361,15 @@ function parseName(fileName) {
 function fileToBase64(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
+
     reader.onload = () => {
-      const res = String(reader.result || "");
-      resolve(res-hook(res));
-      function res-hook(s){ return s.split(",")[1] || ""; }
+      // reader.result => "data:application/pdf;base64,AAAA..."
+      const dataUrl = String(reader.result || "");
+      const base64 = dataUrl.includes(",") ? dataUrl.split(",")[1] : dataUrl;
+      resolve(base64);
     };
-    reader.onerror = reject;
+
+    reader.onerror = () => reject(reader.error || new Error("File read failed"));
     reader.readAsDataURL(file);
   });
 }
