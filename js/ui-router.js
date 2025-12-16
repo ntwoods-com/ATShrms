@@ -14,6 +14,8 @@ import { renderProbationPage } from "./modules/probation.js";
 import { renderSettingsPage } from "./modules/settings.js";
 import { renderPermissionsPage } from "./modules/permissions.js";
 import { renderUsersAdminPage } from "./modules/usersAdmin.js";
+import { renderTestBankPage } from "./modules/testBank.js";
+
 
 
 export function buildNav() {
@@ -37,6 +39,8 @@ export function buildNav() {
     { id: "settings", label: "Settings", roles: ["ADMIN"] },
     { id: "permissions", label: "Permissions", roles: ["ADMIN"] },
     { id: "users-admin", label: "Users", roles: ["ADMIN"] },
+    { id: "test-bank", label: "Test Bank", roles: ["ADMIN"] },
+
   ];
 
   items.forEach(it => {
@@ -82,6 +86,8 @@ function routeFromHash() {
   if (route === "settings") return renderSettingsPage({ headerEl: header, rootEl: body, params });
   if (route === "permissions") return renderPermissionsPage({ headerEl: header, rootEl: body, params });
   if (route === "users-admin") return renderUsersAdminPage({ headerEl: header, rootEl: body, params });
+  if (route === "test-bank") return renderTestBankPage({ headerEl: header, rootEl: body, params });
+
 
   header.textContent = route.toUpperCase();
   body.innerHTML = `<div class="card card-wide">Module <b>${route}</b> pending (NEXT parts).</div>`;
