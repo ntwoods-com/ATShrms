@@ -1,27 +1,15 @@
-export const State = {
+export const state = {
   user: null,
-  sessionToken: localStorage.getItem("sessionToken") || "",
-  permissions: [],
+  sessionToken: localStorage.getItem("hrms_sessionToken") || ""
 };
 
-export function setSession({ user, sessionToken }) {
-  State.user = user;
-  State.sessionToken = sessionToken || "";
-  State.permissions = user?.permissions || [];
-  localStorage.setItem("sessionToken", State.sessionToken);
+export function setSession(sessionToken, user) {
+  state.sessionToken = sessionToken || "";
+  state.user = user || null;
+  if (sessionToken) localStorage.setItem("hrms_sessionToken", sessionToken);
+  else localStorage.removeItem("hrms_sessionToken");
 }
 
 export function clearSession() {
-  State.user = null;
-  State.permissions = [];
-  State.sessionToken = "";
-  localStorage.removeItem("sessionToken");
-}
-
-export function hasPerm(p) {
-  return State.permissions.includes(p);
-}
-
-export function isLoggedIn() {
-  return !!State.sessionToken;
+  setSession("", null);
 }

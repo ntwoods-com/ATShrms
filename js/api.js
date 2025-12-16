@@ -1,25 +1,30 @@
 import { CONFIG } from "./config.js";
-import { State } from "./state.js";
+import { state } from "./state.js";
 
-export async function api(action, data = {}, opts = {}) {
+/**
+ * IMPORTANT:
+ * Hum headers set nahi kar rahe (no application/json),
+ * so preflight OPTIONS trigger nahi hota. :contentReference[oaicite:3]{index=3}
+ */
+export async function apiCall(action, data = {}) {
   const payload = {
     action,
-    token: opts.public ? "" : (State.sessionToken || ""),
+    token: state.sessionToken || "",
     data
   };
 
   const res = await fetch(CONFIG.API_URL, {
     method: "POST",
-    headers: { "Content-Type": "text/plain;charset=utf-8" }, // GAS friendly
-    body: JSON.stringify(payload),
+    body: JSON.stringify(payload) // string body => text/plain
   });
 
-  const json = await res.json().catch(() => null);
-  if (!json) throw new Error("Invalid JSON response from server");
-
-  if (!json.ok) {
-    const msg = json.error?.message || "Unknown server error";
-    throw new Error(msg);
-  }
+  const json = await res.json();
+  if (!json.ok) throw new Error(json?.error?.message || "API error");
   return json.data;
+}
+
+export async function pingApi() {
+  // doGet ping
+  const res = await fetch(CONFIG.API_URL);
+  return res.json();
 }
