@@ -12,10 +12,7 @@ export async function renderTestBank(root) {
     root.innerHTML = `<div class="card"><h3>Not Allowed</h3><p>Only ADMIN can access Question Bank.</p></div>`;
     return;
   }
-
-  // ...baaki file same rehne do
-}
-
+  // ✅ yahin se tumhara existing UI code continue hoga (root.innerHTML = `...`)
 
   root.innerHTML = `
     <div class="page">
