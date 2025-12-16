@@ -1,3 +1,4 @@
+import { CONFIG } from "../config.js";
 export const CONFIG = {
   API_URL: "PASTE_YOUR_DEPLOYED_WEBAPP_URL_HERE"
 };
