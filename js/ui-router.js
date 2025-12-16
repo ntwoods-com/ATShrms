@@ -11,6 +11,10 @@ import { renderFinalInterviewPage } from "./modules/finalInterview.js";
 import { renderOnboardingPage } from "./modules/onboarding.js";
 import { renderEmployeesPage } from "./modules/employees.js";
 import { renderProbationPage } from "./modules/probation.js";
+import { renderSettingsPage } from "./modules/settings.js";
+import { renderPermissionsPage } from "./modules/permissions.js";
+import { renderUsersAdminPage } from "./modules/usersAdmin.js";
+
 
 export function buildNav() {
   const nav = document.getElementById("nav");
@@ -30,6 +34,9 @@ export function buildNav() {
     { id: "onboarding", label: "Onboarding", roles: ["ADMIN","HR"] },
     { id: "employees", label: "Employees", roles: ["ADMIN","HR","OWNER"] },
     { id: "probation", label: "Probation", roles: ["ADMIN","HR"] },
+    { id: "settings", label: "Settings", roles: ["ADMIN"] },
+    { id: "permissions", label: "Permissions", roles: ["ADMIN"] },
+    { id: "users-admin", label: "Users", roles: ["ADMIN"] },
   ];
 
   items.forEach(it => {
@@ -72,6 +79,9 @@ function routeFromHash() {
   if (route === "onboarding") return renderOnboardingPage({ headerEl: header, rootEl: body, params });
   if (route === "employees") return renderEmployeesPage({ headerEl: header, rootEl: body, params });
   if (route === "probation") return renderProbationPage({ headerEl: header, rootEl: body, params });
+  if (route === "settings") return renderSettingsPage({ headerEl: header, rootEl: body, params });
+  if (route === "permissions") return renderPermissionsPage({ headerEl: header, rootEl: body, params });
+  if (route === "users-admin") return renderUsersAdminPage({ headerEl: header, rootEl: body, params });
 
   header.textContent = route.toUpperCase();
   body.innerHTML = `<div class="card card-wide">Module <b>${route}</b> pending (NEXT parts).</div>`;
