@@ -257,17 +257,8 @@ export async function renderTestBank(root) {
     await load();
     resetForm();
     toast("Saved ✅");
-  }
+  });
 
   resetForm();
   await load();
-}
-
-function escapeHtml(s) {
-  return String(s || "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
 }
